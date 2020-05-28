@@ -22,7 +22,7 @@ class SalesDepartment {
         } catch (FileNotFoundException e) {
             System.err.println("Nie odnaleziono pliku " + sourceFileName);
         } catch (NumberFormatException e) {
-            System.err.println("Niepoprawne dane w pliku " + sourceFileName + " są niepoprawne");
+            System.err.println("Niepoprawne dane w pliku " + sourceFileName);
         } catch (IOException e) {
             System.err.println("Wystąpił bład przy próbie utworzenia lub zmodyfikowania pliku " + statsFileName);
         }
