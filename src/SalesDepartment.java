@@ -1,14 +1,30 @@
-import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
+import java.util.Scanner;
 
 class SalesDepartment {
     public static void main(String[] args) {
-        List<Product> products = new ArrayList<>();
-        products.add(new Product("Telewizor", new BigDecimal("100"), new BigDecimal("23")));
-        products.add(new Product("Praliny", new BigDecimal("40"), new BigDecimal("8")));
-        products.add(new Product("Thinking in Java", new BigDecimal("120"), new BigDecimal("5")));
+        String sourceFileName = "products.csv";
+        File sourceFile = new File(sourceFileName);
+        String statsFileName = "stats.txt";
+        File statsFile = new File(statsFileName);
 
-        SalesService.printSalesInfo(products);
+        try (Scanner fileScanner = new Scanner(sourceFile);
+             FileWriter fileWriter = new FileWriter(statsFile)) {
+
+            List<Product> products = DataReader.getProductsFromFile(fileScanner);
+            fileWriter.write(SalesService.getSalesInfo(products));
+            System.out.println(SalesService.getSalesInfo(products));
+
+        } catch (FileNotFoundException e) {
+            System.err.println("Nie odnaleziono pliku " + sourceFileName);
+        } catch (NumberFormatException e) {
+            System.err.println("Niepoprawne dane w pliku " + sourceFileName + " są niepoprawne");
+        } catch (IOException e) {
+            System.err.println("Wystąpił bład przy próbie utworzenia lub zmodyfikowania pliku " + statsFileName);
+        }
     }
 }

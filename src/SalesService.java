@@ -5,10 +5,10 @@ class SalesService {
     private SalesService() {
     }
 
-    public static void printSalesInfo(List<Product> products) {
-        System.out.println("Sprzedaż Netto: " + sumNetPrices(products));
-        System.out.println("Suma podatku VAT ze sprzedaży: " + sumTaxValues(products));
-        System.out.println("Suma sprzedaży Brutto: " + sumGrossPrices(products));
+    public static String getSalesInfo(List<Product> products) {
+        return "Sprzedaż Netto: " + sumNetPrices(products) +
+                "\nSuma podatku VAT ze sprzedaży: " + sumTaxValues(products) +
+                "\nSuma sprzedaży Brutto: " + sumGrossPrices(products);
     }
 
     private static BigDecimal sumNetPrices(List<Product> products) {
@@ -19,6 +19,14 @@ class SalesService {
         return netPriceSum;
     }
 
+    private static BigDecimal sumGrossPrices(List<Product> products) {
+        BigDecimal grossPriceSum = new BigDecimal("0");
+        for (Product product : products) {
+            grossPriceSum = calculateGrossPrice(product);
+        }
+        return grossPriceSum;
+    }
+
     private static BigDecimal sumTaxValues(List<Product> products) {
         BigDecimal taxSum = new BigDecimal("0");
         for (Product product : products) {
@@ -27,23 +35,15 @@ class SalesService {
         return taxSum;
     }
 
-    private static BigDecimal sumGrossPrices(List<Product> products) {
-        BigDecimal grossPriceSum = new BigDecimal("0");
-        BigDecimal netPrice, grossPrice;
-        for (Product product : products) {
-            netPrice = product.getPrice();
-            grossPrice = netPrice.add(calculateTaxValue(product));
-            grossPriceSum = grossPriceSum.add(grossPrice);
-        }
-        return grossPriceSum;
+    private static BigDecimal calculateTaxValue(Product product) {
+        BigDecimal tax = product.getTax();
+        BigDecimal netPrice = product.getPrice();
+        return netPrice.multiply(tax.divide(new BigDecimal(100)));
     }
 
-    private static BigDecimal calculateTaxValue(Product product) {
-        BigDecimal tax;
-        BigDecimal netPrice, taxValue;
-        tax = product.getTax();
-        netPrice = product.getPrice();
-        taxValue = netPrice.multiply(tax.divide(new BigDecimal(100)));
-        return taxValue;
+    private static BigDecimal calculateGrossPrice(Product product) {
+        BigDecimal netPrice = product.getPrice();
+        BigDecimal tax = calculateTaxValue(product);
+        return netPrice.add(tax);
     }
 }
